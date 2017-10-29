@@ -1,5 +1,8 @@
 package com.yunusoksuz.tcpproxy;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.net.Socket;
 
@@ -13,6 +16,8 @@ public class Connection implements Runnable {
     private final int remotePort;
     private Socket serverConnection = null;
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(Connection.class);
+
     public Connection(Socket clientsocket, String remoteIp, int remotePort) {
         this.clientsocket = clientsocket;
         this.remoteIp = remoteIp;
@@ -21,6 +26,7 @@ public class Connection implements Runnable {
 
     @Override
     public void run() {
+        LOGGER.info("new connection {}:{}", clientsocket.getInetAddress().getHostName(), clientsocket.getPort());
         try {
             serverConnection = new Socket(remoteIp, remotePort);
         } catch (IOException e) {
@@ -31,11 +37,14 @@ public class Connection implements Runnable {
             return;
         }
 
+        LOGGER.info("Proxy {}:{} <-> {}:{}", clientsocket.getInetAddress().getHostName(), clientsocket.getPort(), serverConnection.getInetAddress().getHostName(), serverConnection.getPort());
+
         new Thread(new Proxy(clientsocket, serverConnection)).start();
         new Thread(new Proxy(serverConnection, clientsocket)).start();
         new Thread(() -> {
             while (true) {
                 if (clientsocket.isClosed()) {
+                    LOGGER.info("client socket ({}:{}) closed", clientsocket.getInetAddress().getHostName(), clientsocket.getPort());
                     closeServerConnection();
                     break;
                 }
@@ -50,6 +59,7 @@ public class Connection implements Runnable {
     private void closeServerConnection() {
         if (serverConnection != null && !serverConnection.isClosed()) {
             try {
+                LOGGER.info("closing remote host connection {}:{}", serverConnection.getInetAddress().getHostName(), serverConnection.getPort());
                 serverConnection.close();
             } catch (IOException e) {
                 e.printStackTrace();

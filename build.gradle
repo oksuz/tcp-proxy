@@ -2,7 +2,9 @@ group 'com.yunusoksuz'
 version '1.0-SNAPSHOT'
 
 def mainClassName = 'com.yunusoksuz.tcpproxy.AppMain'
+import org.apache.tools.ant.filters.ReplaceTokens
 
+def port = project.hasProperty("port") ? project.property("port") : '5000'
 
 buildscript {
     repositories {
@@ -33,6 +35,15 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
 }
 
+task replacePort(type: Copy) {
+    from('.') {
+        include 'Dockerfile.dist'
+        rename 'Dockerfile.dist', 'Dockerfile'
+        filter(ReplaceTokens, tokens: ['PORT': port])
+    }
+    into('.')
+}
+
 
 shadowJar {
     baseName = 'tcp-proxy'
@@ -41,6 +52,10 @@ shadowJar {
     manifest {
         attributes 'Main-Class': mainClassName
     }
+}
+
+build {
+    dependsOn replacePort
 }
 
 build.finalizedBy shadowJar

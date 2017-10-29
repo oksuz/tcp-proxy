@@ -1,5 +1,8 @@
 package com.yunusoksuz.tcpproxy;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -11,6 +14,7 @@ import java.net.SocketException;
  */
 public class Proxy implements Runnable {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(Proxy.class);
     private final Socket in;
     private final Socket out;
 
@@ -21,6 +25,7 @@ public class Proxy implements Runnable {
 
     @Override
     public void run() {
+        LOGGER.info("Proxy {}:{} --> {}:{}", in.getInetAddress().getHostName(), in.getPort(), out.getInetAddress().getHostName(), out.getPort());
         try {
             InputStream inputStream = getInputStream();
             OutputStream outputStream = getOutputStream();

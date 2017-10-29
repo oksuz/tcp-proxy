@@ -1,5 +1,8 @@
 package com.yunusoksuz.tcpproxy;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -7,6 +10,8 @@ import java.net.Socket;
  * Created by oksuz on 29/10/2017.
  */
 public class TcpIpProxy {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(TcpIpProxy.class);
 
     private final String remoteIp;
     private final int remotePort;
@@ -21,6 +26,7 @@ public class TcpIpProxy {
     public void listen() {
         try {
             ServerSocket serverSocket = new ServerSocket(port);
+            LOGGER.info("listening...");
             while (true) {
                 Socket socket = serverSocket.accept();
                 startThread(new Connection(socket, remoteIp, remotePort));
