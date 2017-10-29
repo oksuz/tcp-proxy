@@ -4,6 +4,6 @@
 
 - Documentation
 - Logging
-- Shadow Jar
+- ~Shadow Jar~
 - Dockerize
 
