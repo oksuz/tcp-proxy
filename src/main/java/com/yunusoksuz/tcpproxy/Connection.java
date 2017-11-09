@@ -31,9 +31,6 @@ public class Connection implements Runnable {
             serverConnection = new Socket(remoteIp, remotePort);
         } catch (IOException e) {
             e.printStackTrace();
-        }
-
-        if (serverConnection == null) {
             return;
         }
 
